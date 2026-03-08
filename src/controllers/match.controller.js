@@ -69,4 +69,3 @@ export const enterMatchResult = async (req, res) => {
     res.status(500).json({ error: "Failed to enter result" });
   }
 };
-

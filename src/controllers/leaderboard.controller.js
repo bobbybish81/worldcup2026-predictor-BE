@@ -25,3 +25,4 @@ export const getLeaderboard = async (req, res) => {
 
   res.json(response);
 };
+

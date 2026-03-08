@@ -17,4 +17,3 @@ export function calculatePoints(pred, actual) {
 
   return 0;
 }
-

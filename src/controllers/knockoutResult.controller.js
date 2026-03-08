@@ -47,3 +47,4 @@ export const enterKnockoutResult = async (req, res) => {
     res.status(500).json({ error: "Failed to score knockout result" });
   }
 };
+
