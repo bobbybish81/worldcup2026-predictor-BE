@@ -46,3 +46,15 @@ export const submitKnockoutPrediction = async (req, res) => {
   }
 };
 
+export const getMyKnockoutPredictions = async (req, res) => {
+  const { round } = req.params;
+
+  const predictions = await prisma.knockoutPrediction.findMany({
+    where: {
+      userId: req.user.id,
+      round,
+    },
+  });
+
+  res.json(predictions);
+};

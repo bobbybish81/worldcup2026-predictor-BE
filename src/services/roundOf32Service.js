@@ -1,4 +1,3 @@
-// deterministic mapping
 const ROUND_OF_32_MAP = [
   ["A2", "B2"],
   ["E1", "T1"],
@@ -18,37 +17,54 @@ const ROUND_OF_32_MAP = [
   ["D2", "G2"],
 ];
 
-export function generateRoundOf32(groupTables, qualified) {
+function formatTeam(team) {
+  return {
+    teamId: team.id ?? team.teamId,
+    teamName: team.name ?? team.teamName,
+    group: team.group
+  };
+}
+
+export function generateRoundOf32(qualified) {
+
   const lookup = {};
 
-  // winners
+  // group winners
   qualified.winners.forEach((t) => {
-    lookup[`${t.group}1`] = t;
+    lookup[`${t.group}1`] = formatTeam(t);
   });
 
   // runners up
   qualified.runnersUp.forEach((t) => {
-    lookup[`${t.group}2`] = t;
+    lookup[`${t.group}2`] = formatTeam(t);
   });
 
-  // best third-place teams
+  // best third place
   qualified.bestThird.forEach((t, i) => {
-    lookup[`T${i + 1}`] = t;
+    lookup[`T${i + 1}`] = formatTeam(t);
   });
 
   const fixtures = [];
 
-  for (const [homeKey, awayKey] of ROUND_OF_32_MAP) {
+  ROUND_OF_32_MAP.forEach(([homeKey, awayKey], index) => {
+
     const homeTeam = lookup[homeKey];
     const awayTeam = lookup[awayKey];
 
-    if (!homeTeam || !awayTeam) continue;
+    if (!homeTeam || !awayTeam) return;
 
     fixtures.push({
+      round: "R32",
+      matchKey: `R32_${index + 1}`,
       homeTeam,
-      awayTeam,
+      awayTeam
     });
-  }
 
-  return fixtures;
+  });
+
+  return {
+    status: "READY",
+    fixtures
+  };
+  
 }
