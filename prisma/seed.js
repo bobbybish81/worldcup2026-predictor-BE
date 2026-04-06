@@ -8,11 +8,11 @@ async function seedTeams() {
     { name: "Mexico", group: "A" },
     { name: "South Africa", group: "A" },
     { name: "Korea Republic", group: "A" },
-    { name: "DEN/MKD/CZE/IRL", group: "A" },
+    { name: "Czech Republic", group: "A" },
 
     // Group B
     { name: "Canada", group: "B" },
-    { name: "ITA/NIR/WAL/BIH", group: "B" },
+    { name: "Bosnia & Herzegovina", group: "B" },
     { name: "Qatar", group: "B" },
     { name: "Switzerland", group: "B" },
 
@@ -26,7 +26,7 @@ async function seedTeams() {
     { name: "USA", group: "D" },
     { name: "Paraguay", group: "D" },
     { name: "Australia", group: "D" },
-    { name: "TUR/ROU/SVK/KOS", group: "D" },
+    { name: "Turkey", group: "D" },
 
     // Group E
     { name: "Germany", group: "E" },
@@ -37,7 +37,7 @@ async function seedTeams() {
     // Group F
     { name: "Netherlands", group: "F" },
     { name: "Japan", group: "F" },
-    { name: "UKR/SWE/POL/ALB", group: "F" },
+    { name: "Sweden", group: "F" },
     { name: "Tunisia", group: "F" },
 
     // Group G
@@ -55,7 +55,7 @@ async function seedTeams() {
     // Group I
     { name: "France", group: "I" },
     { name: "Senegal", group: "I" },
-    { name: "BOL/SUR/IRQ", group: "I" },
+    { name: "Iraq", group: "I" },
     { name: "Norway", group: "I" },
 
     // Group J
@@ -66,7 +66,7 @@ async function seedTeams() {
 
     // Group K
     { name: "Portugal", group: "K" },
-    { name: "NCL/JAM/COD", group: "K" },
+    { name: "DR Congo", group: "K" },
     { name: "Uzbekistan", group: "K" },
     { name: "Colombia", group: "K" },
 

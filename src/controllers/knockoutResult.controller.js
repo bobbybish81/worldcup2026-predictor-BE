@@ -1,50 +1,57 @@
 import prisma from "../config/prisma.js";
+import { scoreKnockoutMatch } from "../services/scoringService.js";
 
 export const enterKnockoutResult = async (req, res) => {
+
   try {
+
     const { round, matchKey, actualWinnerTeamId } = req.body;
 
-    // Fetch predictions for this match
-    const predictions = await prisma.knockoutPrediction.findMany({
-      where: { round, matchKey },
-    });
-
-    if (!predictions.length) {
-      return res.status(404).json({ error: "No predictions found" });
-    }
-
-    // Prevent double scoring
-    if (predictions[0].actualWinnerTeamId !== null) {
+    if (!round || !matchKey || !actualWinnerTeamId) {
       return res.status(400).json({
-        error: "Result already entered for this match",
+        error: "Missing required fields"
       });
     }
 
-    // Update all predictions with actual result
-    await prisma.knockoutPrediction.updateMany({
-      where: { round, matchKey },
-      data: { actualWinnerTeamId },
+    const existing = await prisma.knockoutPrediction.findFirst({
+      where: { round, matchKey }
     });
 
-    // Score predictions
-    for (const p of predictions) {
-      const points = p.winnerTeamId === actualWinnerTeamId ? 2 : 0;
-
-      if (points > 0) {
-        await prisma.points.update({
-          where: { userId: p.userId },
-          data: {
-            knockoutStage: { increment: points },
-            total: { increment: points },
-          },
-        });
-      }
+    if (!existing) {
+      return res.status(404).json({
+        error: "No predictions found for this match"
+      });
     }
 
-    res.json({ message: "Knockout result scored successfully" });
-  } catch (err) {
-    console.error("KNOCKOUT RESULT ERROR:", err);
-    res.status(500).json({ error: "Failed to score knockout result" });
-  }
-};
+    if (existing.actualWinnerTeamId !== null) {
+      return res.status(400).json({
+        error: "Result already entered"
+      });
+    }
 
+    await prisma.knockoutPrediction.updateMany({
+      where: { round, matchKey },
+      data: { actualWinnerTeamId }
+    });
+
+    await scoreKnockoutMatch(
+      round,
+      matchKey,
+      actualWinnerTeamId
+    );
+
+    res.json({
+      message: "Knockout result scored successfully"
+    });
+
+  } catch (err) {
+
+    console.error("KNOCKOUT RESULT ERROR:", err);
+
+    res.status(500).json({
+      error: "Failed to score knockout result"
+    });
+
+  }
+
+};

@@ -1,5 +1,5 @@
 import prisma from "../config/prisma.js";
-import { calculatePoints } from "../services/pointsCalculator.js";
+import { scoreMatch } from "../services/scoringService.js";
 
 export const getGroupMatches = async (req, res) => {
   const matches = await prisma.match.findMany({
@@ -14,58 +14,33 @@ export const getGroupMatches = async (req, res) => {
 };
 
 export const enterMatchResult = async (req, res) => {
+
   try {
+
     const { matchId, homeScore, awayScore } = req.body;
 
-    // 1️⃣ FETCH the match first
-    const match = await prisma.match.findUnique({
-      where: { id: matchId },
-    });
-
-    if (!match) {
-      return res.status(404).json({ error: "Match not found" });
-    }
-
-    // 🔒 GUARD: prevent double entry & double scoring
-    if (match.homeScore !== null || match.awayScore !== null) {
-      return res.status(400).json({
-        error: "Result already entered for this match",
-      });
-    }
-
-    // 2️⃣ SAVE the real result
-    await prisma.match.update({
+    const match = await prisma.match.update({
       where: { id: matchId },
       data: {
         homeScore,
-        awayScore,
-      },
+        awayScore
+      }
     });
 
-    // 3️⃣ FETCH predictions
-    const predictions = await prisma.prediction.findMany({
-      where: { matchId },
+    await scoreMatch(matchId);
+
+    res.json({
+      message: "Match result saved and scored"
     });
 
-    // 4️⃣ SCORE predictions
-    for (const p of predictions) {
-      const points = calculatePoints(
-        { homeScore: p.homeScore, awayScore: p.awayScore },
-        { homeScore, awayScore }
-      );
-
-      await prisma.points.update({
-        where: { userId: p.userId },
-        data: {
-          groupStage: { increment: points },
-          total: { increment: points },
-        },
-      });
-    }
-
-    res.json({ message: "Result saved and points calculated" });
   } catch (err) {
-    console.error("ENTER RESULT ERROR:", err);
-    res.status(500).json({ error: "Failed to enter result" });
+
+    console.error(err);
+
+    res.status(500).json({
+      error: "Failed to enter result"
+    });
+
   }
+
 };
